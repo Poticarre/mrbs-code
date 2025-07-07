@@ -598,6 +598,24 @@ function get_field_custom(string $key, bool $disabled=false)
     return null;
   }
 
+  if ($key === 'maitre_stage') {
+	  $options = [
+		  '--' => 'Attente réponse',
+        'present' => 'Présent',
+        'visio'   => 'En visio',
+        'absent'  => 'Absent'
+    ];
+    $value = isset($custom_fields[$key]) ? $custom_fields[$key] : '';
+    $field = new \MRBS\Form\FieldSelect();
+    $field->setLabel(get_loc_field_name(_tbl('entry'), $key))
+          ->setControlAttributes([
+              'name'     => VAR_PREFIX . $key,
+              'disabled' => $disabled
+          ])
+          ->addSelectOptions($options, $value, true);
+    return $field;
+}
+
   $custom_field = $custom_fields_map[$key];
 
   // Output a checkbox if it's a boolean or integer <= 2 bytes (which we will

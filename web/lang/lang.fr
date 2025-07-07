@@ -617,4 +617,7 @@ $vocab["fatal_no_tables"]    = "Erreur fatale : les tables MRBS n'existent pas o
 $vocab["session_expired"]    = "Votre session a expiré.";
 $vocab["browser_not_supported"] = "Malheureusement, votre navigateur web n'est pas supporté par %s. Vous devez le mettre à jour vers une " .
                                   "version plus récente ou passer à un autre navigateur web.";
+$vocab["maitre_stage"]="Maître de stage/apprentissage";
 $vocab["back"]               = "Retour";
+$vocab_override['fr']['entry.maitre_stage'] = "Maître de stage/d'alternance";
+
