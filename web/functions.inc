@@ -563,6 +563,18 @@ function get_compound_name(?string $username) : string
   return '';
 }
 
+function get_display_name(?string $username) : string
+{
+  if (isset($username))
+  {
+    $display_name = auth()->getDisplayName($username);
+    return (isset($display_name) && ($display_name !== '')) ? $display_name : $username;
+  }
+
+  return '';
+}
+
+
 
 function get_cookie_path()
 {

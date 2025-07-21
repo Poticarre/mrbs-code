@@ -77,7 +77,10 @@ function output_row($row, $returl)
   $values[] = '<a title="' . $html_name . '"' .
                 ' href="' . escape_html(multisite("view_entry.php?$query")) . '">' . $html_name . '</a>';
   // created by
-  $values[] = escape_html(get_compound_name($row['create_by']));
+  $values[] = escape_html(get_display_name($row['create_by']));
+  $values[] = escape_html(get_display_name($row['username']));
+  $values[] = escape_html($row['room_name']);
+
   // start time and link to day view
   $date = getdate($row['start_time']);
 
@@ -245,7 +248,9 @@ if (!($is_ajax || $ics)) {
 $sql_params = array();
 $sql_pred = "(( " . db()->syntax_caseless_contains("E.create_by", $search_str, $sql_params)
   . ") OR (" . db()->syntax_caseless_contains("E.name", $search_str, $sql_params)
-  . ") OR (" . db()->syntax_caseless_contains("E.description", $search_str, $sql_params). ")";
+  . ") OR (" . db()->syntax_caseless_contains("E.description", $search_str, $sql_params)
+  . ") OR (" . db()->syntax_caseless_contains("P.username", $search_str, $sql_params)
+  . ")";
 
 // Also need to search custom fields (but only those with character data,
 // which can include fields that have an associative array of options)
@@ -332,6 +337,8 @@ if (!isset($total))
               ON E.room_id = R.id
        LEFT JOIN " . _tbl('area') . " A
               ON R.area_id = A.id
+       LEFT JOIN " . _tbl('participants') . " P
+       		  ON P.entry_id = E.id
            WHERE $sql_pred";
   $total = db()->query1($sql, $sql_params);
 }
@@ -360,12 +367,14 @@ if (!$ajax_capable || $is_ajax || $ics)
   // Now we set up the "real" query
   $sql = "SELECT E.*, " .
                 db()->syntax_timestamp_to_unix("E.timestamp") . " AS last_updated, " .
-                "A.area_name, R.room_name, R.area_id, A.enable_periods
+                "A.area_name, R.room_name, R.area_id, A.enable_periods, P.username
             FROM " . _tbl('entry') . " E
        LEFT JOIN " . _tbl('room') . " R
               ON E.room_id = R.id
        LEFT JOIN " . _tbl('area') . " A
               ON R.area_id = A.id
+		LEFT JOIN " . _tbl('participants') . " P 
+				ON P.entry_id = E.id
            WHERE $sql_pred
         ORDER BY E.start_time asc";
   // If it's an Ajax query or an ics export we want everything.  Otherwise we use LIMIT to just get
@@ -403,6 +412,9 @@ if (!($is_ajax || $ics))
   // We give some columns a type data value so that the JavaScript knows how to sort them
   echo '<th><span class="normal" data-type="string">' . get_vocab("namebooker") . "</th>\n";
   echo '<th><span class="normal" data-type="string">' . get_vocab("createdby") . "</th>\n";
+  echo '<th><span class="normal" data-type="string">' . get_vocab("username") . "</th>\n";
+  echo '<th><span class="normal" data-type="string">' . get_vocab("room") . "</th>\n";
+
   echo '<th><span class="normal" data-type="title-numeric">' . get_vocab("start_date") . "</span></th>\n";
   echo '<th><span class="normal" data-type="string">' . get_vocab("description") . "</th>\n";
   echo "</tr>\n";
